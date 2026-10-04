@@ -68,7 +68,7 @@
                     </button>
                 </div>
 
-                <!-- Navigation Controls for Classroom Workspace: Horizontal Linear Toolbar (No vertical stacking) -->
+                <!-- Navigation Controls for Classroom Workspace: Horizontal Linear Toolbar -->
                 <div id="classroom-header-nav" class="hidden flex-wrap items-center justify-center lg:justify-end gap-2 w-full lg:w-auto">
                     
                     <!-- 1. รายวิชาทั้งหมด (Return to Portal) -->
@@ -214,7 +214,7 @@
 
             <!-- ================= DYNAMIC CATEGORY VIEWS CONTAINER ================= -->
             <div id="dynamic-category-views">
-                <!-- Dynamically generated score tables for each category -->
+                <!-- Dynamically generated score tables for each category matching Version 1 -->
             </div>
 
             <!-- ================= TAB CONTENT: GRADING SUMMARY (ตัดเกรดรวม) ================= -->
@@ -273,7 +273,7 @@
     </footer>
 
 
-    <!-- ================= MODAL 1: ADD / EDIT SUBJECT & DYNAMIC CATEGORIES ================= -->
+    <!-- ================= MODAL: ADD / EDIT SUBJECT & DYNAMIC CATEGORIES ================= -->
     <div id="subject-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[92vh] overflow-y-auto border border-slate-100">
             <!-- Modal Header -->
@@ -381,45 +381,10 @@
     </div>
 
 
-    <!-- ================= MODAL 2: STUDENT MANAGEMENT ================= -->
-    <div id="student-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full max-h-[85vh] overflow-y-auto border border-slate-100">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-3xl">
-                <div>
-                    <h3 class="text-lg font-bold text-slate-900">จัดการรายชื่อนักเรียน</h3>
-                    <p id="student-modal-subtitle" class="text-xs text-slate-500">ห้องเรียนปัจจุบัน</p>
-                </div>
-                <button onclick="closeStudentModal()" class="w-8 h-8 rounded-full bg-slate-200/70 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition">✕</button>
-            </div>
-            <div class="p-6 space-y-4">
-                <!-- Add new student form -->
-                <div class="flex gap-2">
-                    <input type="number" id="new-std-no" placeholder="เลขที่" class="w-20 px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    <input type="text" id="new-std-id" placeholder="รหัสนักเรียน" class="w-28 px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    <input type="text" id="new-std-name" placeholder="ชื่อ - นามสกุล" class="flex-1 px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
-                    <button onclick="addNewStudent()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-md transition">+ เพิ่ม</button>
-                </div>
-
-                <!-- Students list -->
-                <div class="border border-slate-200 rounded-2xl overflow-hidden max-h-80 overflow-y-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-100 text-slate-700 sticky top-0">
-                            <tr>
-                                <th class="py-2.5 px-3 w-14 text-center">เลขที่</th>
-                                <th class="py-2.5 px-3 w-24">รหัส</th>
-                                <th class="py-2.5 px-3">ชื่อ - นามสกุล</th>
-                                <th class="py-2.5 px-3 w-16 text-center">จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="student-list-tbody" class="divide-y divide-slate-100">
-                            <!-- Student rows -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end rounded-b-3xl">
-                <button onclick="closeStudentModal()" class="px-5 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold">เสร็จสิ้น</button>
-            </div>
+    <!-- ================= REUSABLE GLOBAL MODAL (Used for Students, Manage Columns, Excel Import) ================= -->
+    <div id="global-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4 hidden">
+        <div id="modal-content" class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-slate-100">
+            <!-- Dynamically populated via openModal(title, bodyHtml) -->
         </div>
     </div>
 
@@ -634,6 +599,30 @@
         function getCurrentSubject() {
             if (!state.currentSubjectId) return null;
             return state.subjects.find(s => s.id === state.currentSubjectId) || null;
+        }
+
+        // ================= GENERIC REUSABLE MODAL SYSTEM =================
+
+        function openModal(title, bodyHtml) {
+            const modal = document.getElementById('global-modal');
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
+                    <h3 class="font-extrabold text-slate-800 text-base sm:text-lg">${title}</h3>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full w-8 h-8 flex items-center justify-center transition font-bold text-lg">&times;</button>
+                </div>
+                <div class="p-6 overflow-y-auto">${bodyHtml}</div>
+            `;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('global-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
         }
 
         // ================= PORTAL & NAVIGATION CONTROLS =================
@@ -855,11 +844,11 @@
                     </button>
                 `;
 
-                // View content container
+                // View content container matching Version 1 layout & actions
                 viewsHtml += `
                     <div id="content-${cat.id}" class="tab-content hidden">
                         <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200/80 mb-6">
-                            <!-- Category Header -->
+                            <!-- Category Header Toolbar: Exactly matching Version 1 -->
                             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-5 border-b border-slate-100">
                                 <div>
                                     <div class="flex items-center gap-2">
@@ -868,28 +857,27 @@
                                             สัดส่วน ${cat.weight} คะแนน
                                         </span>
                                     </div>
-                                    <p class="text-xs text-slate-500 mt-0.5">คะแนนดิบทั้งหมดจะถูกแปลงสัดส่วนอัตโนมัติให้เทียบเท่า ${cat.weight} คะแนนในการตัดเกรด</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">คะแนนดิบจะถูกคำนวณและแปลงสัดส่วนให้อัตโนมัติเทียบเท่า ${cat.weight} คะแนน</p>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <button onclick="addColumnToCategory('${cat.id}')" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-500/20 transition flex items-center gap-1.5">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                                        <span>+ เพิ่มช่องคะแนน / กิจกรรม</span>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <button onclick="openManageColumnsModal('${cat.id}')" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-slate-200">
+                                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                                        <span>จัดการหัวข้อคะแนน</span>
+                                    </button>
+                                    <button onclick="openImportScoresModal('${cat.id}')" class="px-3.5 py-2 bg-sky-50 hover:bg-sky-100 text-brand-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-brand-200">
+                                        <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        <span>นำเข้าคะแนน (Excel)</span>
+                                    </button>
+                                    <button onclick="exportScoresCSV('${cat.id}')" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-slate-200">
+                                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                        <span>ส่งออก CSV</span>
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- Category Scores Table -->
-                            <div class="overflow-x-auto mt-4">
-                                <table class="w-full text-left border-collapse text-sm">
-                                    <thead>
-                                        <tr id="thead-${cat.id}" class="bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
-                                            <!-- Injected dynamically in renderCategoryTable() -->
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tbody-${cat.id}" class="divide-y divide-slate-100">
-                                        <!-- Rows injected dynamically -->
-                                    </tbody>
-                                </table>
+                            <!-- Category Table Container (Injected by renderGradeTable) -->
+                            <div id="container-${cat.id}" class="mt-4">
+                                <!-- Rendered by renderGradeTable('${cat.id}') -->
                             </div>
                         </div>
                     </div>
@@ -942,7 +930,7 @@
             } else if (sub.currentTab === 'grading') {
                 renderGradingSummaryTable();
             } else {
-                renderCategoryTable(sub.currentTab);
+                renderGradeTable(sub.currentTab);
             }
         }
 
@@ -1030,156 +1018,465 @@
             renderAttendance();
         }
 
-        // ================= DYNAMIC CATEGORY TABLES (คะแนนแต่ละหมวด) =================
+        // ================= SCORE RECORDING UI & TABLE: RESTORED FROM VERSION 1 =================
 
-        function renderCategoryTable(catId) {
+        function renderGradeTable(type) {
             const sub = getCurrentSubject();
-            if (!sub || !sub[catId]) return;
+            if (!sub || !sub[type]) return;
 
-            const catConfig = sub.categories.find(c => c.id === catId);
-            if (!catConfig) return;
-
-            const thead = document.getElementById(`thead-${catId}`);
-            const tbody = document.getElementById(`tbody-${catId}`);
-            if (!thead || !tbody) return;
-
-            const data = sub[catId];
+            const container = document.getElementById('container-' + type);
+            if (!container) return;
+            const data = sub[type];
+            const catConfig = sub.categories.find(c => c.id === type) || { weight: 0 };
+            const targetScale = Number(catConfig.weight) || 0;
             const students = getFilteredStudents();
             const totalMax = data.cols.reduce((acc, c) => acc + Number(c.max || 0), 0);
 
-            // 1. Build Header
-            let thHtml = `
-                <th class="py-3 px-3 w-12 text-center">เลขที่</th>
-                <th class="py-3 px-3 w-24">รหัส</th>
-                <th class="py-3 px-4 min-w-[150px]">ชื่อ - สกุล</th>
+            let html = `
+                <div class="overflow-x-auto overflow-y-auto max-h-[65vh] relative rounded-2xl border border-slate-200 shadow-2xs">
+                    <table class="w-full text-sm text-center">
+                        <thead class="bg-slate-50 border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+                            <tr>
+                                <th class="p-3.5 sticky left-0 top-0 bg-slate-50 z-40 min-w-[200px] text-left shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] font-bold text-slate-700">
+                                    เลขที่ - ชื่อ-สกุล
+                                </th>
             `;
-
-            data.cols.forEach((col) => {
-                thHtml += `
-                    <th class="py-2.5 px-3 min-w-[130px] border-l border-slate-200">
-                        <div class="flex items-center justify-between gap-1">
-                            <input type="text" value="${col.name}" onchange="updateCategoryColName('${catId}', '${col.id}', this.value)" class="w-full bg-transparent font-bold text-xs text-slate-800 border-b border-transparent hover:border-slate-300 focus:border-brand-500 focus:outline-none">
-                            <button onclick="removeCategoryCol('${catId}', '${col.id}')" title="ลบช่องนี้" class="text-slate-300 hover:text-rose-500 text-xs p-0.5">✕</button>
-                        </div>
-                        <div class="flex items-center gap-1 mt-1 text-[11px] text-slate-400 font-normal">
-                            <span>เต็ม:</span>
-                            <input type="number" value="${col.max}" onchange="updateCategoryColMax('${catId}', '${col.id}', this.value)" class="w-12 bg-white px-1.5 py-0.5 border border-slate-200 rounded text-center font-bold text-slate-700 text-xs">
-                        </div>
+            
+            data.cols.forEach(col => {
+                html += `
+                    <th class="p-3 min-w-[110px] border-l border-slate-200/60 bg-slate-50">
+                        <div class="font-bold text-slate-800 text-xs">${col.name}</div>
+                        <div class="text-[11px] text-slate-500 font-semibold mt-1 bg-slate-200/60 rounded-full px-2 py-0.5 inline-block">เต็ม ${col.max}</div>
                     </th>
                 `;
             });
 
-            // Summary columns
-            thHtml += `
-                <th class="py-3 px-3 text-center bg-slate-100/70 text-slate-700 w-24 border-l border-slate-200">
-                    รวมดิบ <br><span class="text-[10px] text-slate-500">(${totalMax})</span>
-                </th>
-                <th class="py-3 px-3 text-center bg-sky-50 text-brand-900 font-extrabold w-28 border-l border-sky-100">
-                    คิดเป็น <br><span class="text-[10px] text-brand-600">(${catConfig.weight} คะแนน)</span>
-                </th>
+            html += `
+                                <th class="p-3.5 bg-sky-50 text-brand-900 min-w-[100px] border-l-2 border-sky-200 sticky right-[100px] top-0 z-40">
+                                    <div class="font-extrabold text-xs">รวมดิบ</div>
+                                    <div class="text-[10px] font-bold opacity-75 mt-1 bg-sky-200/60 rounded-full px-2 py-0.5 inline-block">เต็ม ${totalMax}</div>
+                                </th>
+                                <th class="p-3.5 bg-emerald-50 text-emerald-900 min-w-[100px] border-l-2 border-emerald-200 sticky right-0 top-0 z-40">
+                                    <div class="font-extrabold text-xs">ตามสัดส่วน</div>
+                                    <div class="text-[10px] font-bold opacity-75 mt-1 bg-emerald-200/60 rounded-full px-2 py-0.5 inline-block">เต็ม ${targetScale}</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
             `;
-            thead.innerHTML = thHtml;
 
-            // 2. Build Rows
             if (students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${5 + data.cols.length}" class="py-8 text-center text-slate-400">ไม่มีข้อมูลนักเรียน</td></tr>`;
-                return;
+                html += `<tr><td colspan="${data.cols.length + 3}" class="p-8 text-center text-slate-400 font-medium">ไม่พบรายชื่อนักเรียนในห้องนี้ (กด "จัดการรายชื่อ" เพื่อเพิ่มนักเรียน)</td></tr>`;
             }
 
-            let rowsHtml = '';
             students.forEach(s => {
                 let rawTotal = 0;
-                let colInputs = '';
-
+                let colsHtml = '';
                 data.cols.forEach(col => {
-                    const score = data.scores[s.id]?.[col.id] ?? '';
-                    if (score !== '' && !isNaN(score)) {
-                        rawTotal += Number(score);
-                    }
-                    colInputs += `
-                        <td class="py-2.5 px-3 border-l border-slate-100 text-center">
-                            <input type="number" step="any" min="0" max="${col.max}" value="${score}" onchange="setCategoryScore('${catId}', '${s.id}', '${col.id}', this.value)" class="w-16 px-2 py-1.5 border border-slate-200 rounded-lg text-center font-semibold text-slate-800 focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
+                    const val = data.scores?.[s.id]?.[col.id] ?? '';
+                    if (val !== '' && val !== undefined && !isNaN(val)) rawTotal += Number(val);
+                    colsHtml += `
+                        <td class="p-2 border-l border-slate-100 bg-white">
+                            <input type="number" step="any" min="0" max="${col.max}" value="${val}" 
+                                oninput="updateScoreOnInput('${type}', '${s.id}', '${col.id}', this.value, this)" 
+                                onblur="renderGradingSummaryTable()"
+                                class="w-full max-w-[90px] mx-auto p-2 border-2 border-slate-100 bg-slate-50 rounded-xl text-center font-bold text-slate-700 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition text-sm" 
+                                placeholder="-">
                         </td>
                     `;
                 });
 
-                // Calculate scaled score
-                let scaledScore = 0;
-                if (totalMax > 0 && catConfig.weight > 0) {
-                    scaledScore = (rawTotal / totalMax) * catConfig.weight;
-                }
-                const formattedScaled = Number.isInteger(scaledScore) ? scaledScore : scaledScore.toFixed(1);
+                const scaled = (totalMax > 0 && targetScale > 0) ? ((rawTotal / totalMax) * targetScale).toFixed(2) : '0.00';
 
-                rowsHtml += `
-                    <tr class="hover:bg-slate-50/80 transition">
-                        <td class="py-2.5 px-3 text-center font-bold text-slate-600">${s.no}</td>
-                        <td class="py-2.5 px-3 text-slate-500 font-mono text-xs">${s.id}</td>
-                        <td class="py-2.5 px-4 font-semibold text-slate-800">${s.name}</td>
-                        ${colInputs}
-                        <td class="py-2.5 px-3 text-center font-bold text-slate-700 bg-slate-50/50 border-l border-slate-100">${rawTotal}</td>
-                        <td class="py-2.5 px-3 text-center font-black text-brand-700 bg-sky-50/50 border-l border-sky-100">${formattedScaled}</td>
+                html += `
+                    <tr class="hover:bg-slate-50/80 transition duration-150">
+                        <td class="p-3 sticky left-0 bg-white z-20 text-left shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)] font-semibold text-slate-800 whitespace-nowrap text-xs sm:text-sm">
+                            <span class="text-slate-400 mr-2 w-5 inline-block text-right font-bold">${s.no}.</span>${s.name}
+                        </td>
+                        ${colsHtml}
+                        <td class="p-3 font-extrabold text-brand-700 border-l-2 border-sky-100 bg-sky-50/80 sticky right-[100px] z-10 row-raw-total text-sm">${rawTotal}</td>
+                        <td class="p-3 font-black text-emerald-600 border-l-2 border-emerald-100 bg-emerald-50/80 sticky right-0 z-10 row-scaled-total text-sm">${scaled}</td>
                     </tr>
                 `;
             });
 
-            tbody.innerHTML = rowsHtml;
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
         }
 
-        function setCategoryScore(catId, studentId, colId, value) {
+        // Real-time calculation on input typing (restored from Version 1)
+        function updateScoreOnInput(type, studentId, colId, val, inputElem) {
             const sub = getCurrentSubject();
-            if (!sub || !sub[catId]) return;
-            if (!sub[catId].scores) sub[catId].scores = {};
-            if (!sub[catId].scores[studentId]) sub[catId].scores[studentId] = {};
+            if (!sub || !sub[type]) return;
+
+            if (!sub[type].scores) sub[type].scores = {};
+            if (!sub[type].scores[studentId]) sub[type].scores[studentId] = {};
+            sub[type].scores[studentId][colId] = val === '' ? '' : parseFloat(val);
+            saveState();
+
+            const catConfig = sub.categories.find(c => c.id === type);
+            const targetScale = catConfig ? Number(catConfig.weight) : 0;
+            const data = sub[type];
+            const totalMax = data.cols.reduce((acc, c) => acc + Number(c.max || 0), 0);
             
-            sub[catId].scores[studentId][colId] = value === '' ? '' : Number(value);
-            saveState();
-            renderCategoryTable(catId);
-        }
+            let rawTotal = 0;
+            data.cols.forEach(col => {
+                const v = data.scores[studentId]?.[col.id];
+                if (v !== '' && v !== undefined && !isNaN(v)) rawTotal += Number(v);
+            });
+            const scaled = (totalMax > 0 && targetScale > 0) ? ((rawTotal / totalMax) * targetScale).toFixed(2) : '0.00';
 
-        function addColumnToCategory(catId) {
-            const sub = getCurrentSubject();
-            if (!sub || !sub[catId]) return;
-            const newColId = 'col_' + Date.now();
-            const colNum = sub[catId].cols.length + 1;
-            const catConfig = sub.categories.find(c => c.id === catId);
-            const defaultName = catConfig ? `${catConfig.name} ${colNum}` : `งาน ${colNum}`;
-
-            sub[catId].cols.push({ id: newColId, name: defaultName, max: 10 });
-            saveState();
-            renderCategoryTable(catId);
-        }
-
-        function removeCategoryCol(catId, colId) {
-            if (!confirm('ยืนยันที่จะลบช่องคะแนนนี้?')) return;
-            const sub = getCurrentSubject();
-            if (!sub || !sub[catId]) return;
-            sub[catId].cols = sub[catId].cols.filter(c => c.id !== colId);
-            saveState();
-            renderCategoryTable(catId);
-        }
-
-        function updateCategoryColName(catId, colId, newName) {
-            const sub = getCurrentSubject();
-            if (!sub || !sub[catId]) return;
-            const col = sub[catId].cols.find(c => c.id === colId);
-            if (col) {
-                col.name = newName;
-                saveState();
+            const tr = inputElem.closest('tr');
+            if (tr) {
+                const rawElem = tr.querySelector('.row-raw-total');
+                const scaledElem = tr.querySelector('.row-scaled-total');
+                if (rawElem) rawElem.innerText = rawTotal;
+                if (scaledElem) scaledElem.innerText = scaled;
             }
         }
 
-        function updateCategoryColMax(catId, colId, newMax) {
+        // ================= COLUMN MANAGEMENT MODAL (RESTORED FROM VERSION 1) =================
+
+        function openManageColumnsModal(type) {
             const sub = getCurrentSubject();
-            if (!sub || !sub[catId]) return;
-            const col = sub[catId].cols.find(c => c.id === colId);
-            if (col) {
-                col.max = Number(newMax) || 0;
-                saveState();
-                renderCategoryTable(catId);
-            }
+            if (!sub || !sub[type]) return;
+
+            const catConfig = sub.categories.find(c => c.id === type);
+            const catName = catConfig ? catConfig.name : type;
+            const data = sub[type];
+            let colsHtml = '';
+            data.cols.forEach((c, i) => {
+                colsHtml += `
+                    <div class="flex gap-3 items-center bg-slate-50 p-3 rounded-2xl border border-slate-200" id="col-row-${c.id}">
+                        <span class="text-slate-400 font-bold w-6 text-center text-xs">${i+1}.</span>
+                        <input type="text" id="col-name-${c.id}" value="${c.name}" placeholder="ชื่อหัวข้อคะแนน" class="flex-1 p-2.5 bg-white border border-slate-200 rounded-xl font-semibold outline-none focus:ring-2 focus:ring-brand-500 text-xs text-slate-800">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-slate-500">เต็ม:</span>
+                            <input type="number" id="col-max-${c.id}" value="${c.max}" class="w-16 p-2 bg-white border border-slate-200 rounded-xl text-center font-bold outline-none focus:ring-2 focus:ring-brand-500 text-xs text-slate-800">
+                            <button type="button" onclick="removeCol('${type}', '${c.id}')" class="p-2 text-rose-500 bg-rose-50 hover:bg-rose-500 hover:text-white rounded-xl transition font-bold text-xs" title="ลบหัวข้อนี้">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            openModal(`จัดการหัวข้อคะแนน: ${catName} (${sub.name})`, `
+                <div class="space-y-3 max-h-[50vh] overflow-y-auto pr-1" id="manage-cols-list">${colsHtml}</div>
+                <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-slate-100 pt-5">
+                    <button type="button" onclick="addCol('${type}')" class="px-4 py-2.5 bg-sky-50 text-brand-700 hover:bg-sky-100 rounded-xl font-bold text-xs transition flex items-center gap-2 border border-brand-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> 
+                        เพิ่มหัวข้อใหม่
+                    </button>
+                    <div class="flex gap-3 w-full sm:w-auto justify-end">
+                        <button type="button" onclick="closeModal()" class="px-5 py-2.5 bg-slate-100 text-slate-700 rounded-xl font-semibold text-xs transition">ยกเลิก</button>
+                        <button type="button" onclick="saveManageColumns('${type}')" class="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-bold text-xs hover:bg-brand-700 transition shadow-md shadow-brand-500/20">บันทึกหัวข้อ</button>
+                    </div>
+                </div>
+            `);
         }
 
-        // Calculate scaled score of a student in a specific category
+        function addCol(type) {
+            const list = document.getElementById('manage-cols-list');
+            const newId = 'col_' + Date.now();
+            const div = document.createElement('div');
+            div.className = 'flex gap-3 items-center bg-slate-50 p-3 rounded-2xl border border-slate-200';
+            div.id = 'col-row-' + newId;
+            div.innerHTML = `
+                <span class="text-slate-400 font-bold w-6 text-center text-xs">#</span>
+                <input type="text" id="col-name-${newId}" value="หัวข้อใหม่" placeholder="ชื่อหัวข้อคะแนน" class="flex-1 p-2.5 bg-white border border-slate-200 rounded-xl font-semibold outline-none focus:ring-2 focus:ring-brand-500 text-xs text-slate-800">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-500">เต็ม:</span>
+                    <input type="number" id="col-max-${newId}" value="10" class="w-16 p-2 bg-white border border-slate-200 rounded-xl text-center font-bold outline-none focus:ring-2 focus:ring-brand-500 text-xs text-slate-800">
+                    <button type="button" onclick="document.getElementById('col-row-${newId}').remove()" class="p-2 text-rose-500 bg-rose-50 hover:bg-rose-500 hover:text-white rounded-xl transition font-bold text-xs"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                </div>
+            `;
+            list.appendChild(div);
+        }
+
+        function removeCol(type, id) {
+            const el = document.getElementById('col-row-' + id);
+            if (el) el.remove();
+        }
+
+        function saveManageColumns(type) {
+            const sub = getCurrentSubject();
+            if (!sub || !sub[type]) return;
+
+            const rows = document.querySelectorAll('#manage-cols-list > div');
+            let newCols = [];
+            rows.forEach(row => {
+                const idMatch = row.id.replace('col-row-', '');
+                const nameInput = document.getElementById('col-name-' + idMatch);
+                const maxInput = document.getElementById('col-max-' + idMatch);
+                if (nameInput && maxInput) {
+                    newCols.push({ id: idMatch, name: nameInput.value.trim() || 'หัวข้อ', max: Number(maxInput.value) || 10 });
+                }
+            });
+
+            if (newCols.length === 0) {
+                alert('ต้องมีอย่างน้อย 1 หัวข้อคะแนน');
+                return;
+            }
+
+            sub[type].cols = newCols;
+            saveState();
+            closeModal();
+            renderGradeTable(type);
+            renderGradingSummaryTable();
+        }
+
+        // ================= IMPORT SCORES FROM EXCEL MODAL (RESTORED FROM VERSION 1) =================
+
+        function openImportScoresModal(type) {
+            const sub = getCurrentSubject();
+            if (!sub || !sub[type]) return;
+
+            const catConfig = sub.categories.find(c => c.id === type);
+            const catName = catConfig ? catConfig.name : type;
+            const cols = sub[type].cols;
+            let optionsHtml = cols.map(c => `<option value="${c.id}">${c.name} (เต็ม ${c.max})</option>`).join('');
+            
+            openModal(`นำเข้าคะแนน: ${catName} (${sub.name})`, `
+                <div class="space-y-4">
+                    <div class="bg-sky-50 text-brand-900 p-4 rounded-2xl text-xs border border-sky-100">
+                        <p class="font-bold mb-2 flex items-center gap-2"><svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> คำแนะนำการคัดลอกและวาง (Copy & Paste จาก Excel)</p>
+                        <ul class="list-decimal pl-5 space-y-1">
+                            <li>เลือกหัวข้อคะแนนเป้าหมายที่ต้องการกรอกคะแนน</li>
+                            <li>ก๊อปปี้จาก Excel คอลัมน์ <span class="font-mono text-xs bg-sky-100 px-1 rounded">เลขที่ | คะแนน</span> หรือ <span class="font-mono text-xs bg-sky-100 px-1 rounded">เลขที่ | ชื่อ | คะแนน</span> แล้ววางลงในช่องด้านล่าง</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">1. เลือกหัวข้อคะแนนเป้าหมาย:</label>
+                        <select id="import-target-col" class="w-full p-2.5 border border-slate-300 rounded-xl outline-none focus:border-brand-500 font-bold text-slate-700 bg-white text-xs">
+                            ${optionsHtml}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">2. วางข้อมูลจาก Excel ที่นี่:</label>
+                        <textarea id="bulk-scores-input" rows="6" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-brand-500 font-mono text-xs shadow-inner" placeholder="1\t10\n2\t9\n3\t8"></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end gap-3 mt-4 border-t border-slate-100 pt-4">
+                        <button type="button" onclick="closeModal()" class="px-5 py-2.5 bg-slate-100 text-slate-700 rounded-xl font-semibold text-xs transition">ยกเลิก</button>
+                        <button type="button" onclick="processBulkScoresSingleCol('${type}')" class="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-bold text-xs hover:bg-brand-700 transition shadow-md shadow-brand-500/20">บันทึกคะแนน</button>
+                    </div>
+                </div>
+            `);
+        }
+
+        function processBulkScoresSingleCol(type) {
+            const sub = getCurrentSubject();
+            if (!sub || !sub[type]) return;
+
+            const colId = document.getElementById('import-target-col').value;
+            const text = document.getElementById('bulk-scores-input').value.trim();
+            if (!text) return;
+
+            const lines = text.split('\n');
+            let successCount = 0;
+            const students = getFilteredStudents();
+
+            lines.forEach(line => {
+                const parts = line.split(/[\t]+/).map(p => p.trim());
+                if (parts.length >= 2) {
+                    let no = parseInt(parts[0]);
+                    let scoreVal = parts[parts.length - 1]; // Last column is score
+                    let score = parseFloat(scoreVal);
+                    if (!isNaN(no) && !isNaN(score)) {
+                        const std = students.find(s => s.no === no);
+                        if (std) {
+                            if (!sub[type].scores[std.id]) sub[type].scores[std.id] = {};
+                            sub[type].scores[std.id][colId] = score;
+                            successCount++;
+                        }
+                    }
+                }
+            });
+
+            saveState();
+            renderGradeTable(type);
+            renderGradingSummaryTable();
+            closeModal();
+            alert(`✅ นำเข้าคะแนนเรียบร้อยแล้ว (${successCount} รายการ)`);
+        }
+
+        function exportScoresCSV(type) {
+            const sub = getCurrentSubject();
+            if (!sub || !sub[type]) return;
+
+            const catConfig = sub.categories.find(c => c.id === type);
+            const catName = catConfig ? catConfig.name : type;
+            const targetScale = catConfig ? Number(catConfig.weight) : 0;
+            const data = sub[type];
+            const students = getFilteredStudents();
+            const totalMax = data.cols.reduce((acc, c) => acc + Number(c.max || 0), 0);
+
+            let headers = ['เลขที่', 'รหัสนักเรียน', 'ชื่อ-สกุล'];
+            data.cols.forEach(c => headers.push(`${c.name} (${c.max})`));
+            headers.push(`รวมดิบ (${totalMax})`, `ตามสัดส่วน (${targetScale})`);
+
+            let csvContent = '\uFEFF' + headers.join(',') + '\n';
+            students.forEach(s => {
+                let row = [s.no, `"${s.id}"`, `"${s.name}"`];
+                let raw = 0;
+                data.cols.forEach(c => {
+                    const v = data.scores?.[s.id]?.[c.id];
+                    if (v !== '' && v !== undefined && !isNaN(v)) {
+                        raw += Number(v);
+                        row.push(v);
+                    } else {
+                        row.push('');
+                    }
+                });
+                const scaled = (totalMax > 0 && targetScale > 0) ? ((raw / totalMax) * targetScale).toFixed(2) : '0.00';
+                row.push(raw, scaled);
+                csvContent += row.join(',') + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `คะแนน_${catName}_${sub.name}_ห้อง${sub.currentClass}.csv`;
+            link.click();
+        }
+
+        // ================= STUDENT MANAGEMENT MODAL: RESTORED FROM VERSION 1 =================
+
+        function openStudentModal() {
+            const sub = getCurrentSubject();
+            if (!sub) return;
+
+            const currentClsObj = (sub.classes || []).find(c => c.id === sub.currentClass) || { name: sub.currentClass };
+            const students = sub.students.filter(s => s.classRoom === sub.currentClass).sort((a, b) => a.no - b.no);
+            
+            let rows = '';
+            students.forEach(s => {
+                rows += `
+                    <div class="flex gap-2 items-center bg-slate-50 p-2.5 rounded-2xl border border-slate-200 student-item-row" data-id="${s.id}">
+                        <div class="w-20">
+                            <input type="number" value="${s.no}" class="student-no-input w-full p-2 border border-slate-200 rounded-xl text-center font-bold bg-white outline-none focus:ring-2 focus:ring-brand-500 text-xs">
+                        </div>
+                        <div class="flex-1">
+                            <input type="text" value="${s.name}" placeholder="ชื่อ นามสกุล" class="student-name-input w-full p-2 border border-slate-200 rounded-xl font-medium bg-white outline-none focus:ring-2 focus:ring-brand-500 text-xs text-slate-800">
+                        </div>
+                        <button type="button" onclick="this.closest('.student-item-row').remove()" class="p-2 text-rose-500 hover:bg-rose-100 rounded-xl transition" title="ลบนักเรียนคนนี้">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </div>
+                `;
+            });
+
+            openModal(`จัดการรายชื่อนักเรียน: ${currentClsObj.name} (${sub.name})`, `
+                <div class="mb-4 p-4 bg-sky-50 border border-sky-100 rounded-2xl">
+                    <label class="block text-xs font-bold text-brand-900 mb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> 
+                        เพิ่มรายชื่อหลายคน (วางข้อมูลจาก Excel)
+                    </label>
+                    <textarea id="bulk-students-input" rows="3" class="w-full p-3 border border-sky-200 rounded-xl text-xs mb-3 outline-none focus:border-brand-500 bg-white placeholder-slate-400 font-mono" placeholder="รูปแบบ: เลขที่ [เว้นวรรคหรือ Tab] ชื่อ-สกุล&#10;ตัวอย่าง:&#10;1&#9;สมชาย ใจดี&#10;2&#9;สมหญิง รักเรียน"></textarea>
+                    <button type="button" onclick="processBulkStudents()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl transition shadow-md w-full sm:w-auto">
+                        นำเข้าสู่รายการ
+                    </button>
+                </div>
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold text-slate-700">รายชื่อในห้องเรียน</span>
+                    <button type="button" onclick="addNewStudentRow()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                        + เพิ่มทีละคน
+                    </button>
+                </div>
+                <div id="student-modal-list" class="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
+                    ${rows}
+                </div>
+                <div class="mt-6 flex justify-end gap-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition">ยกเลิก</button>
+                    <button type="button" onclick="saveStudentList()" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-500/20 transition">บันทึกข้อมูลรายชื่อ</button>
+                </div>
+            `);
+        }
+
+        function addNewStudentRow() {
+            const list = document.getElementById('student-modal-list');
+            const rows = list.querySelectorAll('.student-item-row');
+            const nextNo = rows.length + 1;
+            addNewStudentRowWithValue(nextNo, '');
+        }
+
+        function addNewStudentRowWithValue(no, name) {
+            const sub = getCurrentSubject();
+            const list = document.getElementById('student-modal-list');
+            const newId = (sub ? sub.currentClass : '201') + '-' + Date.now() + Math.floor(Math.random() * 1000);
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center bg-slate-50 p-2.5 rounded-2xl border border-slate-200 student-item-row';
+            div.setAttribute('data-id', newId);
+            div.innerHTML = `
+                <div class="w-20"><input type="number" value="${no}" class="student-no-input w-full p-2 border border-slate-200 rounded-xl text-center font-bold bg-white outline-none focus:ring-2 focus:ring-brand-500 text-xs"></div>
+                <div class="flex-1"><input type="text" value="${name}" placeholder="ชื่อ นามสกุล" class="student-name-input w-full p-2 border border-slate-200 rounded-xl font-medium bg-white outline-none focus:ring-2 focus:ring-brand-500 text-xs text-slate-800"></div>
+                <button type="button" onclick="this.closest('.student-item-row').remove()" class="p-2 text-rose-500 hover:bg-rose-100 rounded-xl transition" title="ลบ"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+            `;
+            list.appendChild(div);
+        }
+
+        function processBulkStudents() {
+            const input = document.getElementById('bulk-students-input');
+            const text = input.value.trim();
+            if (!text) return;
+            const lines = text.split('\n');
+            let nextNo = document.querySelectorAll('.student-item-row').length + 1;
+            
+            lines.forEach(line => {
+                const parts = line.split(/[\t]+/).map(p => p.trim());
+                if (parts.length >= 2) {
+                    let no = parseInt(parts[0]);
+                    if (isNaN(no)) no = nextNo;
+                    const name = parts[1];
+                    if (name) {
+                        addNewStudentRowWithValue(no, name);
+                        nextNo = Math.max(nextNo, no) + 1;
+                    }
+                } else if (parts.length === 1 && parts[0]) {
+                    const spaceMatch = parts[0].match(/^(\d+)[\s]+(.+)$/);
+                    if (spaceMatch) {
+                        let no = parseInt(spaceMatch[1]);
+                        let name = spaceMatch[2].trim();
+                        addNewStudentRowWithValue(no, name);
+                        nextNo = Math.max(nextNo, no) + 1;
+                    } else {
+                        addNewStudentRowWithValue(nextNo, parts[0]);
+                        nextNo++;
+                    }
+                }
+            });
+            input.value = '';
+            const list = document.getElementById('student-modal-list');
+            list.scrollTop = list.scrollHeight;
+            alert("เพิ่มลงในรายการเรียบร้อย (อย่าลืมกดปุ่มบันทึกข้อมูลรายชื่อ)");
+        }
+
+        function saveStudentList() {
+            const sub = getCurrentSubject();
+            if (!sub) return;
+
+            const rows = document.querySelectorAll('#student-modal-list .student-item-row');
+            let newClassStudents = [];
+            rows.forEach(r => {
+                const id = r.getAttribute('data-id');
+                const no = Number(r.querySelector('.student-no-input').value) || 1;
+                const name = r.querySelector('.student-name-input').value.trim();
+                if (name) {
+                    newClassStudents.push({ id, no, name, classRoom: sub.currentClass });
+                }
+            });
+            sub.students = sub.students.filter(s => s.classRoom !== sub.currentClass).concat(newClassStudents);
+            saveState();
+            closeModal();
+            renderAllCurrentTabData();
+            alert('✅ บันทึกรายชื่อนักเรียนเรียบร้อยแล้ว!');
+        }
+
+        // ================= GRADING SUMMARY TABLE (ตัดเกรดรวม 100) =================
+
         function getCategoryScaledScore(catId, studentId) {
             const sub = getCurrentSubject();
             if (!sub || !sub[catId]) return 0;
@@ -1201,8 +1498,6 @@
 
             return (rawTotal / totalMax) * targetWeight;
         }
-
-        // ================= GRADING SUMMARY TABLE (ตัดเกรดรวม 100) =================
 
         function calculateGrade(totalScore) {
             const s = Math.round(totalScore * 10) / 10;
@@ -1226,7 +1521,7 @@
 
             const students = getFilteredStudents();
 
-            // 1. Build Header with all dynamic categories
+            // Build Header with all dynamic categories
             let thHtml = `
                 <th class="py-3 px-3 w-12 text-center">เลขที่</th>
                 <th class="py-3 px-3 w-24">รหัส</th>
@@ -1252,7 +1547,7 @@
             `;
             theadTr.innerHTML = thHtml;
 
-            // 2. Build Student Rows
+            // Build Student Rows
             if (students.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="${5 + sub.categories.length}" class="py-8 text-center text-slate-400">ไม่มีข้อมูลนักเรียน</td></tr>`;
                 return;
@@ -1466,7 +1761,7 @@
                 idInput.value = sub.id;
                 codeInput.value = sub.code;
                 nameInput.value = sub.name;
-                copySection.classList.add('hidden'); // Hide copy option when editing
+                copySection.classList.add('hidden');
 
                 // Render classes with sheet links
                 renderModalClassesList(sub.classes);
@@ -1592,23 +1887,16 @@
             const safeId = catId || ('cat_' + Date.now() + '_' + Math.floor(Math.random() * 1000));
             return `
                 <div class="category-row flex items-center gap-3 p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100/70 border border-slate-200/80 transition-all" data-cat-id="${safeId}">
-                    <!-- Drag / Hash Icon -->
                     <div class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-400 flex items-center justify-center font-black text-sm shrink-0 shadow-2xs">
                         #
                     </div>
-
-                    <!-- Category Name Input -->
                     <div class="flex-1">
                         <input type="text" value="${name || ''}" placeholder="ชื่อหมวดหมู่คะแนน" class="cat-name-input w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
                     </div>
-
-                    <!-- Score Weight Input + Unit -->
                     <div class="flex items-center gap-2 shrink-0">
                         <input type="number" min="0" max="100" value="${weight !== undefined ? weight : 10}" oninput="updateCategoryModalTotal()" class="cat-weight-input w-20 px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-center text-brand-700 focus:ring-2 focus:ring-brand-500 focus:outline-none transition">
                         <span class="text-xs font-semibold text-slate-500 w-12">คะแนน</span>
                     </div>
-
-                    <!-- Delete Button -->
                     <button type="button" onclick="removeCategoryRow(this)" title="ลบหมวดหมู่นี้" class="w-8 h-8 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>
@@ -1813,94 +2101,6 @@
             state.subjects = state.subjects.filter(s => s.id !== subjectId);
             saveState();
             renderSubjectsPortal();
-        }
-
-        // ================= MODAL 2: STUDENT MANAGEMENT =================
-
-        function openStudentModal() {
-            const sub = getCurrentSubject();
-            if (!sub) return;
-            const modal = document.getElementById('student-modal');
-            const subTitle = document.getElementById('student-modal-subtitle');
-            const curCls = (sub.classes || []).find(c => c.id === sub.currentClass);
-            subTitle.innerText = `วิชา: ${sub.name} | ห้อง: ${curCls ? curCls.name : sub.currentClass}`;
-            renderStudentModalList();
-            modal.classList.remove('hidden');
-        }
-
-        function closeStudentModal() {
-            document.getElementById('student-modal').classList.add('hidden');
-            renderAllCurrentTabData();
-        }
-
-        function renderStudentModalList() {
-            const sub = getCurrentSubject();
-            if (!sub) return;
-            const tbody = document.getElementById('student-list-tbody');
-            const students = getFilteredStudents();
-
-            if (students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">ยังไม่มีรายชื่อนักเรียนในห้องนี้</td></tr>`;
-                return;
-            }
-
-            let html = '';
-            students.forEach(s => {
-                html += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="py-2 px-3 text-center font-bold text-slate-600">${s.no}</td>
-                        <td class="py-2 px-3 font-mono text-slate-500">${s.id}</td>
-                        <td class="py-2 px-3 font-semibold text-slate-800">${s.name}</td>
-                        <td class="py-2 px-3 text-center">
-                            <button onclick="deleteStudent('${s.id}')" class="text-rose-500 hover:text-rose-700 font-bold">ลบ</button>
-                        </td>
-                    </tr>
-                `;
-            });
-            tbody.innerHTML = html;
-        }
-
-        function addNewStudent() {
-            const sub = getCurrentSubject();
-            if (!sub) return;
-
-            const no = document.getElementById('new-std-no').value.trim();
-            const id = document.getElementById('new-std-id').value.trim();
-            const name = document.getElementById('new-std-name').value.trim();
-
-            if (!no || !id || !name) {
-                alert('กรุณากรอกเลขที่ รหัสนักเรียน และชื่อ-สกุล');
-                return;
-            }
-
-            // Check duplicate id in this class
-            if (sub.students.some(s => s.id === id && s.classRoom === sub.currentClass)) {
-                alert('รหัสนักเรียนนี้มีอยู่แล้วในห้องนี้');
-                return;
-            }
-
-            sub.students.push({
-                no: Number(no),
-                id: id,
-                name: name,
-                classRoom: sub.currentClass
-            });
-
-            document.getElementById('new-std-no').value = Number(no) + 1;
-            document.getElementById('new-std-id').value = '';
-            document.getElementById('new-std-name').value = '';
-
-            saveState();
-            renderStudentModalList();
-        }
-
-        function deleteStudent(studentId) {
-            const sub = getCurrentSubject();
-            if (!sub) return;
-            if (!confirm('ยืนยันลบนักเรียนคนนี้?')) return;
-            sub.students = sub.students.filter(s => !(s.id === studentId && s.classRoom === sub.currentClass));
-            saveState();
-            renderStudentModalList();
         }
 
         // ================= INITIALIZATION =================
