@@ -199,8 +199,7 @@
                             <thead>
                                 <tr class="bg-slate-50 text-slate-600 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
                                     <th class="py-3 px-4 w-14 text-center">เลขที่</th>
-                                    <th class="py-3 px-4 w-28">รหัส</th>
-                                    <th class="py-3 px-4">ชื่อ - สกุล</th>
+                                                                        <th class="py-3 px-4">ชื่อ - สกุล</th>
                                     <th class="py-3 px-4 text-center">สถานะการเข้าเรียน</th>
                                 </tr>
                             </thead>
@@ -246,8 +245,7 @@
                             <thead>
                                 <tr id="grading-thead-tr" class="bg-slate-50 text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
                                     <th class="py-3 px-3 w-12 text-center">เลขที่</th>
-                                    <th class="py-3 px-3 w-24">รหัส</th>
-                                    <th class="py-3 px-4 min-w-[140px]">ชื่อ - นามสกุล</th>
+                                                                        <th class="py-3 px-4 min-w-[140px]">ชื่อ - นามสกุล</th>
                                     <!-- Dynamic Category Headers will be injected here -->
                                     <th class="py-3 px-3 text-center bg-sky-50/70 text-brand-900 font-extrabold w-24 border-l border-sky-100">รวม 100</th>
                                     <th class="py-3 px-3 text-center bg-emerald-50/70 text-emerald-900 font-extrabold w-20">เกรด</th>
@@ -962,7 +960,7 @@
             if (!sub.attendance[date]) sub.attendance[date] = {};
 
             if (students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400">ไม่มีข้อมูลนักเรียนในห้องนี้ (กด "จัดการรายชื่อ" เพื่อเพิ่มนักเรียน)</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" class="py-8 text-center text-slate-400">ไม่มีข้อมูลนักเรียนในห้องนี้ (กด "จัดการรายชื่อ" เพื่อเพิ่มนักเรียน)</td></tr>`;
                 return;
             }
 
@@ -983,8 +981,7 @@
                 html += `
                     <tr class="hover:bg-slate-50/80 transition">
                         <td class="py-3 px-4 text-center font-bold text-slate-600">${s.no}</td>
-                        <td class="py-3 px-4 text-slate-500 font-mono text-xs">${s.id}</td>
-                        <td class="py-3 px-4 font-semibold text-slate-800">${s.name}</td>
+                                                <td class="py-3 px-4 font-semibold text-slate-800">${s.name}</td>
                         <td class="py-3 px-4">
                             <div class="flex flex-wrap justify-center gap-1.5">
                                 ${btns}
@@ -1314,13 +1311,13 @@
             const students = getFilteredStudents();
             const totalMax = data.cols.reduce((acc, c) => acc + Number(c.max || 0), 0);
 
-            let headers = ['เลขที่', 'รหัสนักเรียน', 'ชื่อ-สกุล'];
+            let headers = ['เลขที่', 'ชื่อ-สกุล'];
             data.cols.forEach(c => headers.push(`${c.name} (${c.max})`));
             headers.push(`รวมดิบ (${totalMax})`, `ตามสัดส่วน (${targetScale})`);
 
             let csvContent = '\uFEFF' + headers.join(',') + '\n';
             students.forEach(s => {
-                let row = [s.no, `"${s.id}"`, `"${s.name}"`];
+                let row = [s.no, `"${s.name}"`];
                 let raw = 0;
                 data.cols.forEach(c => {
                     const v = data.scores?.[s.id]?.[c.id];
@@ -1524,8 +1521,7 @@
             // Build Header with all dynamic categories
             let thHtml = `
                 <th class="py-3 px-3 w-12 text-center">เลขที่</th>
-                <th class="py-3 px-3 w-24">รหัส</th>
-                <th class="py-3 px-4 min-w-[150px]">ชื่อ - สกุล</th>
+                                <th class="py-3 px-4 min-w-[150px]">ชื่อ - สกุล</th>
             `;
 
             (sub.categories || []).forEach(cat => {
@@ -1549,7 +1545,7 @@
 
             // Build Student Rows
             if (students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${5 + sub.categories.length}" class="py-8 text-center text-slate-400">ไม่มีข้อมูลนักเรียน</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${4 + sub.categories.length}" class="py-8 text-center text-slate-400">ไม่มีข้อมูลนักเรียน</td></tr>`;
                 return;
             }
 
@@ -1571,7 +1567,6 @@
                 rowsHtml += `
                     <tr class="hover:bg-slate-50/80 transition">
                         <td class="py-2.5 px-3 text-center font-bold text-slate-600">${s.no}</td>
-                        <td class="py-2.5 px-3 text-slate-500 font-mono text-xs">${s.id}</td>
                         <td class="py-2.5 px-4 font-semibold text-slate-800">${s.name}</td>
                         ${catCells}
                         <td class="py-2.5 px-3 text-center font-black text-brand-700 bg-sky-50/40 border-l border-sky-100">${formattedTotal}</td>
@@ -1599,14 +1594,14 @@
                 return;
             }
 
-            let headers = ['เลขที่', 'รหัสนักเรียน', 'ชื่อ-สกุล'];
+            let headers = ['เลขที่', 'ชื่อ-สกุล'];
             sub.categories.forEach(c => headers.push(`${c.name} (${c.weight})`));
             headers.push('คะแนนรวม 100', 'ระดับเกรด');
 
             let csvContent = '\uFEFF' + headers.join(',') + '\n';
 
             students.forEach(s => {
-                let row = [s.no, `"${s.id}"`, `"${s.name}"`];
+                let row = [s.no, `"${s.name}"`];
                 let total = 0;
                 sub.categories.forEach(c => {
                     const sc = getCategoryScaledScore(c.id, s.id);
@@ -1640,13 +1635,13 @@
 
             try {
                 const students = getFilteredStudents();
-                const headers = ['เลขที่', 'รหัสนักเรียน', 'ชื่อ-สกุล'];
+                const headers = ['เลขที่', 'ชื่อ-สกุล'];
                 sub.categories.forEach(c => headers.push(`${c.name} (${c.weight})`));
                 headers.push('คะแนนรวม 100', 'เกรด');
 
                 const rows = [];
                 students.forEach(s => {
-                    let r = [s.no, s.id, s.name];
+                    let r = [s.no, s.name];
                     let total = 0;
                     sub.categories.forEach(c => {
                         const sc = getCategoryScaledScore(c.id, s.id);
@@ -1698,10 +1693,10 @@
 
             try {
                 const students = getFilteredStudents();
-                const headers = ['เลขที่', 'รหัส', 'ชื่อ-สกุล', 'สถานะ'];
+                const headers = ['เลขที่', 'ชื่อ-สกุล', 'สถานะ'];
                 const rows = students.map(s => {
                     const st = sub.attendance[date]?.[s.id] || '1';
-                    return [s.no, s.id, s.name, st];
+                    return [s.no, s.name, st];
                 });
 
                 const payload = {
