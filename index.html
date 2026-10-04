@@ -77,7 +77,7 @@
                         <span>รายวิชาทั้งหมด</span>
                     </button>
 
-                    <!-- 2. Sheet Links Pills Container (Horizontal Inline Flex) -->
+                    <!-- 2. Sheet Links Pills Container (Horizontal Inline Flex, Dynamically Updated from Settings) -->
                     <div id="header-sheets-container" class="inline-flex items-center gap-1 bg-black/20 p-1 rounded-xl border border-white/15 backdrop-blur-sm shrink-0">
                         <!-- Dynamic sheet links rendered horizontally -->
                     </div>
@@ -150,7 +150,7 @@
                 <div class="flex items-center gap-2 self-end sm:self-center">
                     <button onclick="openCurrentSubjectSettingsModal()" class="px-3.5 py-2 bg-sky-50 hover:bg-sky-100 text-brand-700 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 border border-brand-200">
                         <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        <span>ปรับสัดส่วนคะแนน</span>
+                        <span>ปรับสัดส่วนคะแนน & ลิงก์ชีต</span>
                     </button>
                 </div>
             </div>
@@ -179,7 +179,7 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-5 border-b border-slate-100">
                         <div>
                             <h3 class="text-lg font-bold text-slate-900">บันทึกการเข้าเรียน</h3>
-                            <p class="text-xs text-slate-500">เลือกวันที่เพื่อเช็คชื่อ บันทึกจะถูกซิงก์ตรงกับ Google Sheets</p>
+                            <p class="text-xs text-slate-500">เลือกวันที่เพื่อเช็คชื่อ บันทึกจะถูกซิงก์ตรงกับ Google Sheets ของห้องที่เลือก</p>
                         </div>
                         <div class="flex flex-wrap items-center gap-3">
                             <input type="date" id="attendance-date" onchange="renderAttendance()" class="px-3.5 py-2 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none">
@@ -284,7 +284,7 @@
                     </div>
                     <div>
                         <h3 id="subject-modal-title" class="text-lg font-bold text-slate-900">เพิ่มรายวิชาใหม่</h3>
-                        <p class="text-xs text-slate-500">กำหนดข้อมูลวิชา ห้องเรียน และสัดส่วนคะแนน</p>
+                        <p class="text-xs text-slate-500">กำหนดข้อมูลวิชา ห้องเรียน ลิงก์ Google Sheets และสัดส่วนคะแนน</p>
                     </div>
                 </div>
                 <button onclick="closeSubjectModal()" class="w-8 h-8 rounded-full bg-slate-200/70 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition">✕</button>
@@ -306,23 +306,26 @@
                     </div>
                 </div>
 
-                <!-- Section: Classes Management in Subject -->
+                <!-- Section: Classes & Google Sheet Links Management in Subject -->
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/70">
                     <div class="flex justify-between items-center mb-3">
-                        <label class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                            <span>🏫 ห้องเรียนที่สอนในวิชานี้</span>
-                        </label>
-                        <button type="button" onclick="addClassRow()" class="text-xs text-brand-600 hover:text-brand-800 font-bold flex items-center gap-1">
+                        <div>
+                            <label class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                                <span>🏫 ห้องเรียนและลิงก์ Google Sheets ของวิชานี้</span>
+                            </label>
+                            <p class="text-[11px] text-slate-500">ปุ่ม "ชีตห้อง" ด้านบนจะอัปเดตตามชื่อห้องและลิงก์ Google Sheet ที่ระบุไว้ที่นี่ทันที</p>
+                        </div>
+                        <button type="button" onclick="addClassRow()" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-xl text-xs font-bold flex items-center gap-1 border border-brand-200 transition">
                             + เพิ่มห้องเรียน
                         </button>
                     </div>
-                    <div id="modal-classes-list" class="space-y-2.5">
-                        <!-- Dynamic class rows -->
+                    <div id="modal-classes-list" class="space-y-3">
+                        <!-- Dynamic class cards rendered via renderModalClassesList -->
                     </div>
                 </div>
 
                 <!-- ================= CORE FEATURE: DYNAMIC CATEGORIES SETTING ================= -->
-                <!-- As shown in user screenshot: ตั้งค่าหมวดหมู่และสัดส่วนคะแนนของวิชานี้ -->
+                <!-- ตั้งค่าหมวดหมู่และสัดส่วนคะแนนของวิชานี้ -->
                 <div class="border border-slate-200 rounded-2xl p-5 bg-white shadow-sm">
                     <div class="flex justify-between items-center mb-2">
                         <div>
@@ -453,7 +456,7 @@
             subjects: []
         };
 
-        // Helper: Create a brand new subject with custom/dynamic categories array
+        // Helper: Create a brand new subject with custom/dynamic categories array & classes with sheetUrls
         function createNewSubjectObject(id, code, name, customCategories, copyStudents) {
             const subId = id || ('sub_' + Date.now() + '_' + Math.floor(Math.random() * 1000));
             
@@ -472,13 +475,20 @@
                 currentClass: '201',
                 currentTab: 'attendance',
                 classes: [
-                    { id: '201', name: 'ห้อง 201', scriptUrl: SCRIPT_URL },
-                    { id: '202', name: 'ห้อง 202', scriptUrl: SCRIPT_URL }
+                    {
+                        id: '201',
+                        name: 'ห้อง 201',
+                        sheetUrl: 'https://docs.google.com/spreadsheets/d/1qvPukhpq2CxjAvYcpWZgIE5PZNvRhcezRFMhm-6231M/edit?usp=sharing',
+                        scriptUrl: SCRIPT_URL
+                    },
+                    {
+                        id: '202',
+                        name: 'ห้อง 202',
+                        sheetUrl: 'https://docs.google.com/spreadsheets/d/1FnAckdm-8RHp7k4f929XIidUxJDVI_eO4_oT-DFU-Ss/edit?usp=sharing',
+                        scriptUrl: SCRIPT_URL
+                    }
                 ],
-                sheetsLinks: [
-                    { name: 'ชีตห้อง 201', url: 'https://docs.google.com/spreadsheets/d/1qvPukhpq2CxjAvYcpWZgIE5PZNvRhcezRFMhm-6231M/edit?usp=sharing' },
-                    { name: 'ชีตห้อง 202', url: 'https://docs.google.com/spreadsheets/d/1FnAckdm-8RHp7k4f929XIidUxJDVI_eO4_oT-DFU-Ss/edit?usp=sharing' }
-                ],
+                sheetsLinks: [],
                 students: copyStudents ? JSON.parse(JSON.stringify(copyStudents)) : JSON.parse(JSON.stringify(INITIAL_STUDENTS)),
                 attendance: {},
                 categories: categories
@@ -522,6 +532,7 @@
                         const initialSub = createNewSubjectObject('sub_default', 'ว21101', 'วิทยาการคำนวณ (ม.1)');
                         if (parsedLegacy.students) initialSub.students = parsedLegacy.students;
                         if (parsedLegacy.classes) initialSub.classes = parsedLegacy.classes;
+                        if (parsedLegacy.sheetsLinks) initialSub.sheetsLinks = parsedLegacy.sheetsLinks;
                         if (parsedLegacy.attendance) initialSub.attendance = parsedLegacy.attendance;
                         
                         // Migrate legacy categories object to array if needed
@@ -553,8 +564,28 @@
                     }
                 }
 
-                // Ensure all subjects have valid categories array
+                // Ensure all subjects have valid classes with sheetUrl and valid categories array
                 state.subjects.forEach(sub => {
+                    // Auto-migrate sheetUrl into classes if missing
+                    if (sub.classes && Array.isArray(sub.classes)) {
+                        sub.classes.forEach((cls, idx) => {
+                            if (!cls.sheetUrl) {
+                                let matched = null;
+                                if (sub.sheetsLinks && sub.sheetsLinks.length > 0) {
+                                    matched = sub.sheetsLinks.find(l => l.name.includes(cls.id) || l.name.includes(cls.name));
+                                    if (!matched && idx < sub.sheetsLinks.length) {
+                                        matched = sub.sheetsLinks[idx];
+                                    }
+                                }
+                                if (matched) {
+                                    cls.sheetUrl = matched.url;
+                                } else {
+                                    cls.sheetUrl = '';
+                                }
+                            }
+                        });
+                    }
+
                     if (!sub.categories || !Array.isArray(sub.categories)) {
                         const converted = [];
                         if (sub.categories && typeof sub.categories === 'object') {
@@ -733,17 +764,44 @@
             // Update banner details
             document.getElementById('banner-sub-code').innerText = sub.code;
             document.getElementById('banner-sub-name').innerText = sub.name;
-            const currentClsObj = sub.classes.find(c => c.id === sub.currentClass) || sub.classes[0];
+            const currentClsObj = (sub.classes || []).find(c => c.id === sub.currentClass) || sub.classes[0];
             document.getElementById('banner-class-badge').innerText = currentClsObj ? currentClsObj.name : '';
 
-            // Render Sheet Links horizontally inside inline-flex pill
+            // Render Sheet Links horizontally: DYNAMICALLY GENERATED FROM sub.classes
             const sheetsContainer = document.getElementById('header-sheets-container');
             if (sheetsContainer) {
                 let html = '';
-                (sub.sheetsLinks || []).forEach(l => {
-                    html += `<a href="${l.url}" target="_blank" class="px-2.5 py-1 text-xs font-bold bg-white/20 hover:bg-white/30 text-white rounded-lg transition border border-white/10 inline-flex items-center gap-1 shrink-0">📊 ${l.name}</a>`;
+                (sub.classes || []).forEach(cls => {
+                    if (cls.sheetUrl && cls.sheetUrl.trim()) {
+                        const displayName = cls.name.startsWith('ชีต') ? cls.name : ('ชีต' + cls.name);
+                        html += `
+                            <a href="${cls.sheetUrl}" target="_blank" class="px-2.5 py-1 text-xs font-bold bg-white/20 hover:bg-white/30 text-white rounded-lg transition border border-white/10 inline-flex items-center gap-1 shrink-0" title="เปิด Google Sheet: ${cls.name}">
+                                📊 ${displayName}
+                            </a>
+                        `;
+                    }
                 });
-                sheetsContainer.innerHTML = html;
+
+                // Fallback to sub.sheetsLinks if individual classes don't have sheetUrl
+                if (html === '' && sub.sheetsLinks && sub.sheetsLinks.length > 0) {
+                    sub.sheetsLinks.forEach(l => {
+                        if (l.url && l.url.trim()) {
+                            const displayName = l.name.startsWith('ชีต') ? l.name : ('ชีต' + l.name);
+                            html += `
+                                <a href="${l.url}" target="_blank" class="px-2.5 py-1 text-xs font-bold bg-white/20 hover:bg-white/30 text-white rounded-lg transition border border-white/10 inline-flex items-center gap-1 shrink-0" title="เปิด Google Sheet: ${l.name}">
+                                    📊 ${displayName}
+                                </a>
+                            `;
+                        }
+                    });
+                }
+
+                if (html === '') {
+                    sheetsContainer.classList.add('hidden');
+                } else {
+                    sheetsContainer.classList.remove('hidden');
+                    sheetsContainer.innerHTML = html;
+                }
             }
 
             // Render Class Switcher horizontally inside inline-flex pill
@@ -1277,7 +1335,7 @@
             const sub = getCurrentSubject();
             if (!sub) return;
 
-            const curClass = sub.classes.find(c => c.id === sub.currentClass);
+            const curClass = (sub.classes || []).find(c => c.id === sub.currentClass);
             const scriptUrl = (curClass && curClass.scriptUrl) ? curClass.scriptUrl : SCRIPT_URL;
 
             const btn = document.getElementById('btn-save-grading');
@@ -1334,7 +1392,7 @@
             const sub = getCurrentSubject();
             if (!sub) return;
 
-            const curClass = sub.classes.find(c => c.id === sub.currentClass);
+            const curClass = (sub.classes || []).find(c => c.id === sub.currentClass);
             const scriptUrl = (curClass && curClass.scriptUrl) ? curClass.scriptUrl : SCRIPT_URL;
             const date = document.getElementById('attendance-date').value;
 
@@ -1376,7 +1434,7 @@
         }
 
 
-        // ================= MODAL 1: SUBJECT & CATEGORY SETTINGS =================
+        // ================= MODAL 1: SUBJECT, CLASSES & CATEGORY SETTINGS =================
 
         function openCurrentSubjectSettingsModal() {
             const sub = getCurrentSubject();
@@ -1404,13 +1462,13 @@
                 // Editing existing subject
                 const sub = state.subjects.find(s => s.id === subjectId);
                 if (!sub) return;
-                titleEl.innerText = 'ตั้งค่ารายวิชาและสัดส่วนคะแนน';
+                titleEl.innerText = 'ตั้งค่ารายวิชา ห้องเรียน และสัดส่วนคะแนน';
                 idInput.value = sub.id;
                 codeInput.value = sub.code;
                 nameInput.value = sub.name;
                 copySection.classList.add('hidden'); // Hide copy option when editing
 
-                // Render classes
+                // Render classes with sheet links
                 renderModalClassesList(sub.classes);
 
                 // Render Categories (Dynamic!)
@@ -1423,10 +1481,20 @@
                 nameInput.value = '';
                 copySection.classList.remove('hidden');
 
-                // Default classes
+                // Default classes with sample sheet URLs
                 renderModalClassesList([
-                    { id: '201', name: 'ห้อง 201', scriptUrl: SCRIPT_URL },
-                    { id: '202', name: 'ห้อง 202', scriptUrl: SCRIPT_URL }
+                    {
+                        id: '201',
+                        name: 'ห้อง 201',
+                        sheetUrl: 'https://docs.google.com/spreadsheets/d/1qvPukhpq2CxjAvYcpWZgIE5PZNvRhcezRFMhm-6231M/edit?usp=sharing',
+                        scriptUrl: SCRIPT_URL
+                    },
+                    {
+                        id: '202',
+                        name: 'ห้อง 202',
+                        sheetUrl: 'https://docs.google.com/spreadsheets/d/1FnAckdm-8RHp7k4f929XIidUxJDVI_eO4_oT-DFU-Ss/edit?usp=sharing',
+                        scriptUrl: SCRIPT_URL
+                    }
                 ]);
 
                 // Default Categories
@@ -1446,17 +1514,34 @@
             document.getElementById('subject-modal').classList.add('hidden');
         }
 
+        // Render each class as a card with room ID, Name, Google Sheet URL, and Apps Script URL
         function renderModalClassesList(classes) {
             const container = document.getElementById('modal-classes-list');
             if (!container) return;
             let html = '';
-            classes.forEach((cls) => {
+            (classes || []).forEach((cls) => {
                 html += `
-                    <div class="class-row flex items-center gap-2">
-                        <input type="text" placeholder="รหัสห้อง เช่น 201" value="${cls.id}" class="modal-cls-id w-24 px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none">
-                        <input type="text" placeholder="ชื่อห้อง เช่น ห้อง 201" value="${cls.name}" class="modal-cls-name w-32 px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none">
-                        <input type="text" placeholder="Apps Script URL (ค่าเริ่มต้นพร้อมใช้)" value="${cls.scriptUrl || SCRIPT_URL}" class="modal-cls-url flex-1 px-3 py-1.5 border border-slate-300 rounded-xl text-xs text-slate-600 focus:outline-none">
-                        <button type="button" onclick="removeClassRow(this)" class="p-1.5 text-slate-400 hover:text-rose-600 text-xs">✕</button>
+                    <div class="class-row bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 flex-1">
+                                <span class="text-xs font-bold text-slate-500 shrink-0">ห้องเรียน:</span>
+                                <input type="text" placeholder="รหัสห้อง เช่น 201" value="${cls.id}" class="modal-cls-id w-24 px-3 py-1.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <input type="text" placeholder="ชื่อห้อง เช่น ห้อง 201" value="${cls.name}" class="modal-cls-name flex-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <button type="button" onclick="removeClassRow(this)" title="ลบห้องนี้" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition text-xs shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">📊 ลิงก์ Google Sheet (สำหรับปุ่มเปิดดูชีต):</label>
+                                <input type="text" placeholder="https://docs.google.com/spreadsheets/d/..." value="${cls.sheetUrl || ''}" class="modal-cls-sheet-url w-full px-3 py-1.5 border border-slate-200 rounded-xl text-xs text-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-500 mb-1">⚡ Apps Script Web App URL (บันทึกข้อมูล):</label>
+                                <input type="text" placeholder="${SCRIPT_URL}" value="${cls.scriptUrl || SCRIPT_URL}" class="modal-cls-url w-full px-3 py-1.5 border border-slate-200 rounded-xl text-xs text-slate-600 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                        </div>
                     </div>
                 `;
             });
@@ -1467,12 +1552,28 @@
             const container = document.getElementById('modal-classes-list');
             const newNum = container.children.length + 1;
             const div = document.createElement('div');
-            div.className = 'class-row flex items-center gap-2';
+            div.className = 'class-row bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs space-y-2.5';
             div.innerHTML = `
-                <input type="text" placeholder="รหัสห้อง เช่น 20${newNum}" value="20${newNum}" class="modal-cls-id w-24 px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none">
-                <input type="text" placeholder="ชื่อห้อง" value="ห้อง 20${newNum}" class="modal-cls-name w-32 px-3 py-1.5 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none">
-                <input type="text" placeholder="Apps Script URL" value="${SCRIPT_URL}" class="modal-cls-url flex-1 px-3 py-1.5 border border-slate-300 rounded-xl text-xs text-slate-600 focus:outline-none">
-                <button type="button" onclick="removeClassRow(this)" class="p-1.5 text-slate-400 hover:text-rose-600 text-xs">✕</button>
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 flex-1">
+                        <span class="text-xs font-bold text-slate-500 shrink-0">ห้องเรียน:</span>
+                        <input type="text" placeholder="รหัสห้อง เช่น 20${newNum}" value="20${newNum}" class="modal-cls-id w-24 px-3 py-1.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <input type="text" placeholder="ชื่อห้อง" value="ห้อง 20${newNum}" class="modal-cls-name flex-1 px-3 py-1.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <button type="button" onclick="removeClassRow(this)" title="ลบห้องนี้" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition text-xs shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">📊 ลิงก์ Google Sheet (สำหรับปุ่มเปิดดูชีต):</label>
+                        <input type="text" placeholder="https://docs.google.com/spreadsheets/d/..." value="" class="modal-cls-sheet-url w-full px-3 py-1.5 border border-slate-200 rounded-xl text-xs text-slate-700 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">⚡ Apps Script Web App URL (บันทึกข้อมูล):</label>
+                        <input type="text" placeholder="${SCRIPT_URL}" value="${SCRIPT_URL}" class="modal-cls-url w-full px-3 py-1.5 border border-slate-200 rounded-xl text-xs text-slate-600 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                </div>
             `;
             container.appendChild(div);
         }
@@ -1578,7 +1679,7 @@
             }
         }
 
-        // Save Subject from Modal
+        // Save Subject, Classes, Sheets Links & Categories from Modal
         function saveSubjectFromModal() {
             const id = document.getElementById('modal-sub-id').value;
             const code = document.getElementById('modal-sub-code').value.trim();
@@ -1589,15 +1690,29 @@
                 return;
             }
 
-            // Extract classes
+            // Extract classes and their individual sheet URLs
             const classRows = document.querySelectorAll('#modal-classes-list .class-row');
             const classes = [];
+            const sheetsLinks = [];
+
             classRows.forEach(row => {
                 const cId = row.querySelector('.modal-cls-id').value.trim();
                 const cName = row.querySelector('.modal-cls-name').value.trim();
-                const cUrl = row.querySelector('.modal-cls-url').value.trim() || SCRIPT_URL;
+                const cSheetUrl = row.querySelector('.modal-cls-sheet-url').value.trim();
+                const cScriptUrl = row.querySelector('.modal-cls-url').value.trim() || SCRIPT_URL;
                 if (cId && cName) {
-                    classes.push({ id: cId, name: cName, scriptUrl: cUrl });
+                    classes.push({
+                        id: cId,
+                        name: cName,
+                        sheetUrl: cSheetUrl,
+                        scriptUrl: cScriptUrl
+                    });
+                    if (cSheetUrl) {
+                        sheetsLinks.push({
+                            name: cName,
+                            url: cSheetUrl
+                        });
+                    }
                 }
             });
 
@@ -1640,6 +1755,7 @@
                     sub.code = code;
                     sub.name = name;
                     sub.classes = classes;
+                    sub.sheetsLinks = sheetsLinks;
                     sub.categories = categories;
 
                     // Ensure sub[cat.id] exists for each new category
@@ -1668,6 +1784,7 @@
 
                 const newSub = createNewSubjectObject(null, code, name, categories, copyStudents);
                 newSub.classes = classes;
+                newSub.sheetsLinks = sheetsLinks;
                 newSub.currentClass = classes[0].id;
                 state.subjects.push(newSub);
             }
@@ -1685,7 +1802,7 @@
                 renderSubjectsPortal();
             }
 
-            alert('✅ บันทึกข้อมูลและสัดส่วนคะแนนเรียบร้อยแล้ว!');
+            alert('✅ บันทึกข้อมูลวิชา ลิงก์ชีต และสัดส่วนคะแนนเรียบร้อยแล้ว!');
         }
 
         function deleteSubject(subjectId) {
@@ -1705,7 +1822,7 @@
             if (!sub) return;
             const modal = document.getElementById('student-modal');
             const subTitle = document.getElementById('student-modal-subtitle');
-            const curCls = sub.classes.find(c => c.id === sub.currentClass);
+            const curCls = (sub.classes || []).find(c => c.id === sub.currentClass);
             subTitle.innerText = `วิชา: ${sub.name} | ห้อง: ${curCls ? curCls.name : sub.currentClass}`;
             renderStudentModalList();
             modal.classList.remove('hidden');
