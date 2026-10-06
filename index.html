@@ -77,6 +77,12 @@
                         <span>รายวิชาทั้งหมด</span>
                     </button>
 
+                    <!-- Cloud Sync Button -->
+                    <button onclick="syncAllToCloud(true)" title="บันทึกข้อมูลทั้งหมดขึ้นคลาวด์ Google Sheets เพื่อให้เครื่องอื่นเห็น" class="px-3 py-2 bg-white/15 hover:bg-white/25 text-white rounded-xl transition inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold border border-white/20 shadow-sm shrink-0">
+                        <svg class="w-4 h-4 text-sky-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <span>บันทึกขึ้นคลาวด์</span>
+                    </button>
+
                     <!-- 2. Sheet Links Pills Container (Horizontal Inline Flex, Dynamically Updated from Settings) -->
                     <div id="header-sheets-container" class="inline-flex items-center gap-1 bg-black/20 p-1 rounded-xl border border-white/15 backdrop-blur-sm shrink-0">
                         <!-- Dynamic sheet links rendered horizontally -->
@@ -115,6 +121,17 @@
                     <p class="text-sm text-slate-500 mt-1">เลือกวิชาเพื่อบันทึกคะแนน เช็คชื่อ หรือกำหนดสัดส่วนคะแนนเฉพาะวิชา</p>
                 </div>
                 <div class="flex items-center gap-3">
+                    <button onclick="loadFromCloud(true)" title="ดึงข้อมูลล่าสุดจาก Google Sheets (Cloud Sync)" class="px-4 py-3 bg-sky-50 hover:bg-sky-100 text-brand-700 rounded-2xl font-bold border border-brand-200 shadow-sm transition flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        <span>ดึงข้อมูลจากชีต (Cloud Sync)</span>
+                    </button>
+                    <button onclick="exportBackupJson()" title="ดาวน์โหลดไฟล์สำรองข้อมูล (.json) เพื่อนำไปเปิดในเครื่องอื่น" class="p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl transition border border-slate-200 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    </button>
+                    <label title="นำเข้าไฟล์สำรองข้อมูล (.json) จากเครื่องอื่น" class="p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl transition border border-slate-200 flex items-center justify-center cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
+                        <input type="file" accept=".json" onchange="importBackupJson(event)" class="hidden">
+                    </label>
                     <button onclick="openSubjectModal(null)" class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold shadow-md shadow-brand-500/25 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                         <span>เพิ่มรายวิชาใหม่</span>
@@ -471,10 +488,106 @@
             return sub;
         }
 
+
+        // ==========================================
+        // ONLINE CLOUD SYNC & CROSS-DEVICE FUNCTIONS
+        // ==========================================
+
+        let cloudSyncTimeout = null;
+        function autoSyncToCloud() {
+            clearTimeout(cloudSyncTimeout);
+            cloudSyncTimeout = setTimeout(() => {
+                syncAllToCloud(false);
+            }, 2000);
+        }
+
+        async function syncAllToCloud(notify = false) {
+            try {
+                const payload = {
+                    action: 'saveSystemData',
+                    state: state
+                };
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (notify) {
+                    alert('✅ บันทึกข้อมูลขึ้นคลาวด์ (Google Sheets) เรียบร้อยแล้ว!\nเครื่องอื่นและ Google Account อื่นจะเห็นข้อมูลนี้ทันที');
+                }
+            } catch (e) {
+                console.error('Failed to sync to cloud', e);
+                if (notify) alert('เกิดข้อผิดพลาดในการบันทึกขึ้นคลาวด์: ' + e.message);
+            }
+        }
+
+        async function loadFromCloud(notify = false) {
+            try {
+                // Fetch latest state from Google Apps Script
+                const res = await fetch(SCRIPT_URL + '?action=loadSystemData&t=' + Date.now());
+                const json = await res.json();
+                if (json && json.status !== 'empty' && json.subjects && Array.isArray(json.subjects) && json.subjects.length > 0) {
+                    state = json;
+                    localStorage.setItem('classMeMultiSubjectData', JSON.stringify(state));
+                    if (state.currentSubjectId && getCurrentSubject()) {
+                        renderWorkspaceHeader();
+                        renderDynamicTabsAndViews();
+                        const curSub = getCurrentSubject();
+                        switchTab(curSub.currentTab || 'attendance');
+                    } else {
+                        renderSubjectsPortal();
+                    }
+                    if (notify) alert('✅ ดึงข้อมูลล่าสุดจากคลาวด์ (Google Sheets) สำเร็จแล้ว!');
+                    return true;
+                } else if (notify) {
+                    alert('ยังไม่มีข้อมูลที่บันทึกไว้บนคลาวด์ (ใช้ข้อมูลในเครื่องปัจจุบัน)');
+                }
+            } catch (e) {
+                console.warn('Could not load from cloud, using local cache:', e);
+                if (notify) alert('ไม่สามารถเชื่อมต่อคลาวด์ได้ในขณะนี้: กรุณาตรวจสอบการตั้งค่า Deploy ของ Google Apps Script');
+            }
+            return false;
+        }
+
+        function exportBackupJson() {
+            const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(state, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute('href', dataStr);
+            downloadAnchor.setAttribute('download', 'ClassMe_Backup_' + new Date().toISOString().split('T')[0] + '.json');
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importBackupJson(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed && Array.isArray(parsed.subjects)) {
+                        state = parsed;
+                        saveState();
+                        syncAllToCloud(false);
+                        renderSubjectsPortal();
+                        alert('✅ นำเข้าข้อมูลสำรองสำเร็จเรียบร้อยแล้ว!');
+                    } else {
+                        alert('รูปแบบไฟล์ไม่ถูกต้อง');
+                    }
+                } catch (err) {
+                    alert('เกิดข้อผิดพลาดในการอ่านไฟล์: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
         // Save state to LocalStorage
         function saveState() {
             try {
                 localStorage.setItem('classMeMultiSubjectData', JSON.stringify(state));
+                autoSyncToCloud();
             } catch (e) {
                 console.error('Failed to save to localStorage', e);
             }
@@ -2106,6 +2219,8 @@
             } else {
                 goToSubjectsPortal();
             }
+            // Automatically check and pull latest updates from cloud in background
+            loadFromCloud(false);
         });
     </script>
 </body>
