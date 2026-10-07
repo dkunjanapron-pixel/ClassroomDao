@@ -120,20 +120,33 @@
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">รายวิชาที่สอน</h2>
                     <p class="text-sm text-slate-500 mt-1">เลือกวิชาเพื่อบันทึกคะแนน เช็คชื่อ หรือกำหนดสัดส่วนคะแนนเฉพาะวิชา</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="loadFromCloud(true)" title="ดึงข้อมูลล่าสุดจาก Google Sheets (Cloud Sync)" class="px-4 py-3 bg-sky-50 hover:bg-sky-100 text-brand-700 rounded-2xl font-bold border border-brand-200 shadow-sm transition flex items-center gap-2">
-                        <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        <span>ดึงข้อมูลจากชีต (Cloud Sync)</span>
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <!-- ปุ่ม 1: อัปโหลดข้อมูลเครื่องนี้ขึ้นคลาวด์ Google Sheets -->
+                    <button onclick="syncAllToCloud(true)" id="btn-portal-cloud-upload" title="กดจากเครื่องที่มีข้อมูล เพื่อส่งข้อมูลทั้งหมดขึ้น Google Sheets" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold shadow-sm transition flex items-center gap-2 text-xs sm:text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <span>☁️ บันทึกขึ้นชีต (Cloud Upload)</span>
                     </button>
-                    <button onclick="exportBackupJson()" title="ดาวน์โหลดไฟล์สำรองข้อมูล (.json) เพื่อนำไปเปิดในเครื่องอื่น" class="p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl transition border border-slate-200 flex items-center justify-center">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+
+                    <!-- ปุ่ม 2: ดึงข้อมูลล่าสุดจาก Google Sheets มาใส่เครื่องนี้ -->
+                    <button onclick="loadFromCloud(true)" id="btn-portal-cloud-load" title="กดจากเครื่องอื่น เพื่อดึงข้อมูลล่าสุดจาก Google Sheets มาแสดง" class="px-4 py-2.5 bg-sky-50 hover:bg-sky-100 text-brand-700 rounded-2xl font-bold border border-brand-200 shadow-sm transition flex items-center gap-2 text-xs sm:text-sm">
+                        <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        <span>🔄 ดึงข้อมูลจากชีต (Cloud Sync)</span>
                     </button>
-                    <label title="นำเข้าไฟล์สำรองข้อมูล (.json) จากเครื่องอื่น" class="p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl transition border border-slate-200 flex items-center justify-center cursor-pointer">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
+
+                    <!-- ปุ่ม 3: สำรองข้อมูลเป็นไฟล์ .json -->
+                    <button onclick="exportBackupJson()" title="ดาวน์โหลดไฟล์สำรองข้อมูล (.json) สำหรับย้ายเครื่องแบบไฟล์" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl transition border border-slate-200 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    </button>
+
+                    <!-- ปุ่ม 4: กู้คืนข้อมูลจากไฟล์ .json -->
+                    <label title="เลือกไฟล์สำรองข้อมูล (.json) เพื่อนำเข้าข้อมูลทันที" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl transition border border-slate-200 flex items-center justify-center cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
                         <input type="file" accept=".json" onchange="importBackupJson(event)" class="hidden">
                     </label>
-                    <button onclick="openSubjectModal(null)" class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold shadow-md shadow-brand-500/25 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+
+                    <!-- ปุ่ม 5: เพิ่มรายวิชาใหม่ -->
+                    <button onclick="openSubjectModal(null)" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold shadow-md shadow-brand-500/25 transition flex items-center gap-2 text-xs sm:text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                         <span>เพิ่มรายวิชาใหม่</span>
                     </button>
                 </div>
@@ -502,6 +515,14 @@
         }
 
         async function syncAllToCloud(notify = false) {
+            const btn = document.getElementById('btn-portal-cloud-upload');
+            let originalHtml = '';
+            if (btn) {
+                originalHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = `<span class="animate-spin inline-block">🔄</span> กำลังบันทึก...`;
+            }
+
             try {
                 const payload = {
                     action: 'saveSystemData',
@@ -510,21 +531,33 @@
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
                 if (notify) {
-                    alert('✅ บันทึกข้อมูลขึ้นคลาวด์ (Google Sheets) เรียบร้อยแล้ว!\nเครื่องอื่นและ Google Account อื่นจะเห็นข้อมูลนี้ทันที');
+                    alert('✅ บันทึกข้อมูลขึ้นคลาวด์ (Google Sheets) เรียบร้อยแล้ว!\n\nตอนนี้ข้อมูลวิชาและคะแนนทั้งหมดถูกส่งไปเก็บบน Google Sheet แล้วครับ\nเครื่องอื่นสามารถเปิดหน้าเว็บนี้ แล้วกดปุ่ม "🔄 ดึงข้อมูลจากชีต (Cloud Sync)" เพื่อแสดงข้อมูลได้ทันที');
                 }
             } catch (e) {
                 console.error('Failed to sync to cloud', e);
                 if (notify) alert('เกิดข้อผิดพลาดในการบันทึกขึ้นคลาวด์: ' + e.message);
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
             }
         }
 
         async function loadFromCloud(notify = false) {
+            const btn = document.getElementById('btn-portal-cloud-load');
+            let originalHtml = '';
+            if (btn && notify) {
+                originalHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = `<span class="animate-spin inline-block">🔄</span> กำลังดึงข้อมูล...`;
+            }
+
             try {
-                // Fetch latest state from Google Apps Script
                 const res = await fetch(SCRIPT_URL + '?action=loadSystemData&t=' + Date.now());
                 const json = await res.json();
                 if (json && json.status !== 'empty' && json.subjects && Array.isArray(json.subjects) && json.subjects.length > 0) {
@@ -538,14 +571,21 @@
                     } else {
                         renderSubjectsPortal();
                     }
-                    if (notify) alert('✅ ดึงข้อมูลล่าสุดจากคลาวด์ (Google Sheets) สำเร็จแล้ว!');
+                    if (notify) alert('✅ ดึงข้อมูลล่าสุดจากคลาวด์ (Google Sheets) เรียบร้อยแล้ว!');
                     return true;
                 } else if (notify) {
-                    alert('ยังไม่มีข้อมูลที่บันทึกไว้บนคลาวด์ (ใช้ข้อมูลในเครื่องปัจจุบัน)');
+                    alert('⚠️ ยังไม่พบข้อมูลที่บันทึกไว้บน Google Sheets\n\nสาเหตุ:\nยังไม่เคยกดบันทึกข้อมูลจากเครื่องแรกขึ้นชีต หรือยังไม่ได้อัปเดตโค้ด Code.gs ใหม่\n\nวิธีแก้ไข:\n1. เปิดหน้าเว็บจาก "เครื่องแรกที่มีข้อมูลของคุณครู"\n2. กดปุ่มสีเขียว "☁️ บันทึกขึ้นชีต (Cloud Upload)" ด้านบน 1 ครั้ง\n3. จากนั้นกลับมากดปุ่มนี้ที่เครื่องนี้อีกครั้ง ข้อมูลจะมาครบ 100% ครับ');
                 }
             } catch (e) {
                 console.warn('Could not load from cloud, using local cache:', e);
-                if (notify) alert('ไม่สามารถเชื่อมต่อคลาวด์ได้ในขณะนี้: กรุณาตรวจสอบการตั้งค่า Deploy ของ Google Apps Script');
+                if (notify) {
+                    alert('⚠️ ไม่สามารถเชื่อมต่อกับ Google Apps Script ได้\n\nกรุณาตรวจสอบว่า:\n1. ได้คัดลอกโค้ด Code.gs ล่าสุดลงใน Google Apps Script แล้วหรือยัง\n2. ได้ทำการ Deploy ใหม่ โดยตั้งค่า "Who has access (ผู้มีสิทธิ์เข้าถึง)" เป็น "Anyone (ทุกคน)" หรือยัง');
+                }
+            } finally {
+                if (btn && notify) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
             }
             return false;
         }
